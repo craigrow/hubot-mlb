@@ -45,11 +45,6 @@ module.exports = (robot) ->
           home_team_city = result.data.games.game[i].home_team_city
           home_team_score = result.data.games.game[i].linescore.r.home
 
-          #debug
-          #msg.send "visitor: " + away_team_city
-          #msg.send "home: " + home_team_city
-          #debug
-
           winner = findWinner(home_team_city, home_team_score, away_team_city, away_team_score, city)
 
           msg.send "The " + team + " " + winner + " yesterday"
@@ -57,6 +52,15 @@ module.exports = (robot) ->
           gamescore = away_team_city + " "  + away_team_score + " at " + home_team_city + " " + home_team_score
 
           msg.send gamescore
+
+  robot.respond /standings (.*)|standings/i, (msg) ->
+    division = msg.match[1]
+    msg.http('https://erikberg.com/mlb/standings.json')
+      .get() (err, res, body) ->
+        data = JSON.parse(body)
+        standings = getStandings(data, division)
+
+        msg.send standings
 
   getDay = () ->
     today = new Date
@@ -147,3 +151,92 @@ module.exports = (robot) ->
       "won"
     else
       "error"
+
+  getStandings = (data, division) ->
+    alCentral = """
+
+    American League Central
+    =======================
+    #{data.standing[0].last_name} \t #{data.standing[0].won}-#{data.standing[0].lost}
+    #{data.standing[1].last_name} \t #{data.standing[1].won}-#{data.standing[1].lost}
+    #{data.standing[2].last_name} \t #{data.standing[2].won}-#{data.standing[2].lost}
+    #{data.standing[3].last_name} \t #{data.standing[3].won}-#{data.standing[3].lost}
+    #{data.standing[4].last_name} \t #{data.standing[4].won}-#{data.standing[4].lost}
+    
+    """
+
+    alEast = """
+
+    American League East
+    =======================
+    #{data.standing[5].last_name} \t #{data.standing[5].won}-#{data.standing[5].lost}
+    #{data.standing[6].last_name} \t #{data.standing[6].won}-#{data.standing[6].lost}
+    #{data.standing[7].last_name} \t #{data.standing[7].won}-#{data.standing[7].lost}
+    #{data.standing[8].last_name} \t #{data.standing[8].won}-#{data.standing[8].lost}
+    #{data.standing[9].last_name} \t #{data.standing[9].won}-#{data.standing[9].lost}
+    
+    """
+
+    alWest = """
+
+    American League West
+    =======================
+    #{data.standing[10].last_name} \t #{data.standing[10].won}-#{data.standing[10].lost}
+    #{data.standing[11].last_name} \t #{data.standing[11].won}-#{data.standing[11].lost}
+    #{data.standing[12].last_name} \t #{data.standing[12].won}-#{data.standing[12].lost}
+    #{data.standing[13].last_name} \t #{data.standing[13].won}-#{data.standing[13].lost}
+    #{data.standing[14].last_name} \t #{data.standing[14].won}-#{data.standing[14].lost}
+    
+    """
+
+    nlCentral = """
+
+    National League Central
+    =======================
+
+    #{data.standing[15].last_name} \t #{data.standing[15].won}-#{data.standing[15].lost}
+    #{data.standing[16].last_name} \t #{data.standing[16].won}-#{data.standing[16].lost}
+    #{data.standing[17].last_name} \t #{data.standing[17].won}-#{data.standing[17].lost}
+    #{data.standing[18].last_name} \t #{data.standing[18].won}-#{data.standing[18].lost}
+    #{data.standing[19].last_name} \t #{data.standing[19].won}-#{data.standing[19].lost}
+    
+    """
+
+    nlEast = """
+
+    National League East
+    =======================
+    #{data.standing[20].last_name} \t #{data.standing[20].won}-#{data.standing[20].lost}
+    #{data.standing[21].last_name} \t #{data.standing[21].won}-#{data.standing[21].lost}
+    #{data.standing[22].last_name} \t #{data.standing[22].won}-#{data.standing[22].lost}
+    #{data.standing[23].last_name} \t #{data.standing[23].won}-#{data.standing[23].lost}
+    #{data.standing[24].last_name} \t #{data.standing[24].won}-#{data.standing[24].lost}
+    
+    """
+
+    nlWest = """
+
+    National League West
+    =======================
+    #{data.standing[25].last_name} \t #{data.standing[25].won}-#{data.standing[25].lost}
+    #{data.standing[26].last_name} \t #{data.standing[26].won}-#{data.standing[26].lost}
+    #{data.standing[27].last_name} \t #{data.standing[27].won}-#{data.standing[27].lost}
+    #{data.standing[28].last_name} \t #{data.standing[28].won}-#{data.standing[28].lost}
+    #{data.standing[29].last_name} \t #{data.standing[29].won}-#{data.standing[29].lost}
+    
+    """
+    
+    if division is "alc"
+      standings = alCentral
+    else if division is "ale"
+      standings = alEast
+    else if division is "alw"
+      standings = alWest
+    else if division is "nlc"
+      standings = nlCentral
+    else if division is "nle"
+      standings = nlEast
+    else if division is "nlw"
+      standings = nlWest
+    else
+      standings = alWest + alCentral + alEast + nlWest + nlCentral + nlEast
