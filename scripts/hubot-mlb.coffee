@@ -1,5 +1,5 @@
 # Description:
-#   Get the score of your favorite MLB team's latest game
+#   Get MLB scores and standings
 #
 # Dependencies:
 #   None
@@ -9,9 +9,12 @@
 #
 # Commands:
 #   how bout|about them|those <team name> - tells you how your team did yesterday
+#   standings - gives you the standings for each MLB division
+#   standdings alw|alc|ale|nlw|nlc|nle - gives you divisional standings
 #
 # Author:
 #	craigrow
+#   craigrow@hotmail.com
 
 module.exports = (robot) ->
   robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
