@@ -18,15 +18,17 @@
 
 module.exports = (robot) ->
   robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
-    team = msg.match[1]
+    team = msg.match[3]
 
     city = getCity(team)
-
-    day = getDay() - 1
+    day = getDay()
     month = getMonth()
     year = getYear()
 
-    msg.http('http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json')
+    url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
+    #msg.send "url: " + url
+
+    msg.http(url)
       .get() (err, res, body) ->
         if res.statusCode is 404
           msg.send "Sorry, it appears there were no games yesterday"
@@ -67,14 +69,14 @@ module.exports = (robot) ->
 
   getDay = () ->
     today = new Date
-    dd = today.getDate()
+    dd = today.getDate() - 1
     if dd < 10
       dd = '0' + dd
     else dd
 
   getMonth = () ->
     today = new Date
-    mm = today.getDate() + 1
+    mm = today.getDate()
     if mm < 10
       mm = '0' + mm
     else mm
@@ -92,6 +94,8 @@ module.exports = (robot) ->
       city = "Houston"
     else if team is "Rangers" or team is "rangers"
       city = "Texas"
+    else if team is "Athletics" or team is "athletics" or team is "a's" or team is "A's"
+      city = "Oakland"
     else if team is "Royals" or team is "royals"
       city = "Kansas City"
     else if team is "Twins" or team is "twins"
@@ -110,8 +114,6 @@ module.exports = (robot) ->
       city = "NY Yankees"
     else if team is "Blue Jays" or team is "blue jays" or team is "Jays" or team is "jays"
       city = "Toronto"
-    else if team is "Rays" or "rays"
-      city = "Tampa Bay"
     else if team is "Dodgers" or team is "dodgers"
       city = "LA Dodgers"
     else if team is "Giants" or team is "giants"
@@ -140,6 +142,8 @@ module.exports = (robot) ->
       city = "Miami"
     else if team is "Nationals" or "nationals" or "Nats" or "nats"
       city = "Washington"
+    else if team is "Rays" or team is "rays"
+      city = "Tampa Bay"
     else
       city = "I don't know the " + team
 
